@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartInventory API — Dashboard + Docs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .endpoint { font-family: monospace; }
+        .method-get { color: #0d6efd; }
+        .method-post { color: #198754; }
+        .method-put { color: #fd7e14; }
+        .method-delete { color: #dc3545; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-hdd-network"></i> SmartInventory API
+            </span>
+            <span class="badge bg-success">.NET 8 + SQL Server</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- API Status -->
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> API Status: <strong>Running</strong> | 
+            <a href="/swagger" target="_blank" class="alert-link">Open Swagger Docs →</a>
+        </div>
+
+        <div class="row">
+            <!-- Live Data -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-collection"></i> Categories — Live from API
+                    </div>
+                    <ul id="categories" class="list-group list-group-flush">
+                        <li class="list-group-item">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-box-seam"></i> Products — Live from API
+                    </div>
+                    <table class="table mb-0">
+                        <thead><tr><th>Name</th><th>Price</th><th>Qty</th><th>Category</th></tr></thead>
+                        <tbody id="products">
+                            <tr><td colspan="4">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints Section -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="bi bi-code-slash"></i> REST API Endpoints — What This Project Delivers
+            </div>
+            <div class="card-body">
+                <p class="text-muted">This dashboard is powered by the ASP.NET Core Web API below. All data above is fetched from these endpoints in real-time.</p>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Test</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge method-get">GET</span></td>
+                            <td class="endpoint">/api/Categories</td>
+                            <td>Get all categories with product count</td>
+                            <td><a href="/api/Categories" target="_blank" class="btn btn-sm btn-outline-primary">Try</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge method-get">GET</span></td>
+                            <td class="endpoint">/api/Categories/{id}</td>
+                            <td>Get single category + its products</td>
+                            <td><a href="/api/Categories/1" target="_blank" class="btn btn-sm btn-outline-primary">Try</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge method-get">GET</span></td>
+                            <td class="endpoint">/api/Products</td>
+                            <td>Get all products with category details</td>
+                            <td><a href="/api/Products" target="_blank" class="btn btn-sm btn-outline-primary">Try</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-3">
+                    <strong>Tech Stack:</strong> 
+                    <span class="badge bg-secondary">ASP.NET Core 8</span>
+                    <span class="badge bg-secondary">Entity Framework Core</span>
+                    <span class="badge bg-secondary">SQL Server</span>
+                    <span class="badge bg-secondary">REST API</span>
+                    <span class="badge bg-secondary">Swagger/OpenAPI</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <a href="/swagger" class="btn btn-lg btn-dark">
+                <i class="bi bi-file-earmark-code"></i> View Complete API Documentation
+            </a>
+        </div>
+    </div>
+
+<script>
+    // Categories Load Karo
+    fetch('/api/Categories')
+        .then(r => r.json())
+        .then(data => {
+            let html = '';
+            data.forEach(c => html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                ${c.name}
+                <span class="badge bg-primary rounded-pill">${c.products?.length || 0} items</span>
+            </li>`);
+            document.getElementById('categories').innerHTML = html;
+        })
+        .catch(() => document.getElementById('categories').innerHTML = '<li class="list-group-item text-danger">API Error</li>');
+
+    // Products Load Karo
+    fetch('/api/Products')
+        .then(r => r.json())
+        .then(data => {
+            let html = '';
+            data.forEach(p => html += `<tr>
+                <td>${p.name}</td>
+                <td>$${p.price}</td>
+                <td>${p.quantity}</td>
+                <td><span class="badge bg-info">${p.category?.name || 'N/A'}</span></td>
+            </tr>`);
+            document.getElementById('products').innerHTML = html;
+        })
+        .catch(() => document.getElementById('products').innerHTML = '<tr><td colspan="4" class="text-danger">API Error - Create ProductsController first</td></tr>');
+</script>
+</body>
+</html>
